@@ -537,8 +537,8 @@ def write_aml(customers: list[Customer], out: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--customers", type=int, default=500)
-    parser.add_argument("--output", type=Path, default=Path("data/landing"))
+    parser.add_argument("--customers", type=int, default=50)
+    parser.add_argument("--output", type=Path, default=Path("data\sample"))
     args = parser.parse_args()
 
     args.output.mkdir(parents=True, exist_ok=True)

@@ -36,6 +36,28 @@ from src.models import DecisionOutcome
 
 GENESIS_HASH = "0" * 64
 
+# Fields considered personally identifying. These are tokenised (not removed)
+# before the feature vector is persisted to the audit store, so an auditor
+# can still verify the decision is bound to a single customer — via the
+# Emirates ID which is retained by regulatory requirement — without exposing
+# the raw PII values. Rule packs never read these fields (verified by test
+# test_rule_packs_dont_read_pii_fields), so minimisation doesn't affect
+# replay correctness.
+PII_FIELDS_TO_TOKENISE = ("full_name", "phone", "email", "dob", "emirate")
+
+
+def _tokenise_pii(vector: dict) -> dict:
+    """Return a copy of the vector with PII fields replaced by deterministic
+    SHA-256 tokens. Identical values produce identical tokens, so a later
+    audit can still confirm two decisions referenced the same underlying
+    person — but the raw values are not recoverable from the snapshot."""
+    out = dict(vector)
+    for field in PII_FIELDS_TO_TOKENISE:
+        if field in out and out[field] is not None:
+            raw = str(out[field]).strip().lower()
+            out[field] = "tok_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+    return out
+
 
 AUDIT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS snapshot (
@@ -87,13 +109,18 @@ def _last_hash_for_product(product: str) -> str:
 
 
 def _write_feature_vector(vector: dict) -> tuple[str, str]:
-    """Write the feature vector to a content-addressed file. Returns (hash, path)."""
-    vector_hash = _canonical_sha256(vector)
+    """Write the feature vector to a content-addressed file. Returns (hash, path).
+
+    PII fields are tokenised before write and before hashing — the hash is
+    over the minimised vector, which is what reviewers see on disk.
+    """
+    minimised = _tokenise_pii(vector)
+    vector_hash = _canonical_sha256(minimised)
     fv_dir = AUDIT_DIR / "feature_vectors" / vector_hash[:2]
     fv_dir.mkdir(parents=True, exist_ok=True)
     fv_path = fv_dir / f"{vector_hash}.json"
     if not fv_path.exists():
-        fv_path.write_text(json.dumps(vector, sort_keys=True, indent=2, default=str))
+        fv_path.write_text(json.dumps(minimised, sort_keys=True, indent=2, default=str))
         _mark_readonly(fv_path)
     return vector_hash, str(fv_path.relative_to(AUDIT_DIR.parent))
 
