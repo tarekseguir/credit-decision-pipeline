@@ -299,8 +299,3 @@ credit-pipeline-demo/
 └── tests/                             ← 54 tests
 ```
 
----
-
-## License
-
-MIT.
