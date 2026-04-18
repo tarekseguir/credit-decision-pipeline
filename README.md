@@ -63,6 +63,30 @@ python run.py
 
 ---
 
+## Dashboard preview
+
+The Streamlit dashboard has three pages. Launch it with `./run.sh dashboard` (macOS/Linux) or `.\run.ps1 dashboard` (Windows), then open [http://localhost:8501](http://localhost:8501).
+
+### Portfolio overview
+
+Headline counts per outcome, outcome breakdown by product, and the top decline reasons.
+
+![Portfolio overview](docs/screenshots/portfolio_overview.png)
+
+### Data quality scorecard
+
+Every rule from the latest run with its severity, threshold, actual fail ratio, and pass/fail status. MUST_PASS breaches block gold promotion.
+
+![Data quality scorecard](docs/screenshots/data_quality_scorecard.png)
+
+### Decision lookup and audit
+
+Pick any decision to see its full snapshot, feature vector, chain pointers, and replay the outcome.
+
+![Decision lookup and audit](docs/screenshots/decision_lookup_and_audit.png)
+
+---
+
 ## Architecture at a glance
 
 ```mermaid
@@ -298,4 +322,3 @@ credit-pipeline-demo/
 │   └── app.py                         ← Streamlit: 3 pages
 └── tests/                             ← 54 tests
 ```
-
