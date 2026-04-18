@@ -1,7 +1,5 @@
 # Design Decisions
 
-Non-obvious choices made in this repo and why. Intended for the interview reviewer.
-
 ## 1. Custom DAG runner instead of Airflow
 
 **Choice:** A ~200-line DAG runner in `src/orchestration/dag.py`.
