@@ -1,0 +1,23 @@
+# Generated data & databases (runtime — never commit)
+data/bronze/
+data/silver/
+data/gold/
+data/audit/
+# Note: data/sample/ IS committed — small reference dataset (50 customers)
+
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
